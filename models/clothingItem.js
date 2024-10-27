@@ -1,5 +1,4 @@
 const mongoose = require("mongoose");
-const { create } = require("./user");
 
 const clothingItemSchema = new mongoose.Schema({
   name: {
