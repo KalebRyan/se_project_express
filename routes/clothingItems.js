@@ -6,10 +6,10 @@ const {
   deleteItem,
 } = require("../controllers/clothingItems");
 
-router.get("/items", getItems);
+router.get("/", getItems);
 
-router.post("/items", createItem);
+router.post("/", createItem);
 
-router.delete("/items/:itemId", deleteItem);
+router.delete("/:itemId", deleteItem);
 
 module.exports = router;
