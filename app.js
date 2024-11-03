@@ -18,3 +18,10 @@ mongoose
 app.listen(PORT, () => {
   console.log(`Server is listening on port ${PORT}`);
 });
+
+app.use((req, res, next) => {
+  req.user = {
+    _id: "67214c36c9701d602ecffcd5",
+  };
+  next();
+});
