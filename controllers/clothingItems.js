@@ -1,19 +1,21 @@
 const ClothingItem = require("../models/clothingItem");
+const { invalidData, notFound, serverError } = require("../utils/errors");
 
 const createItem = (req, res) => {
   const { name, weather, imageUrl } = req.body;
-  // const { user } = req;
+  const { user } = req;
   ClothingItem.create({
     name,
     weather,
     imageUrl,
+    owner: user._id,
   })
     .then((item) => {
       res.send({ data: item });
     })
     .catch((err) => {
       console.error(err);
-      res.status(400).json({ message: err.message });
+      res.status(invalidData).send({ message: err.message });
     });
 };
 
@@ -24,7 +26,7 @@ const getItems = (req, res) => {
     })
     .catch((err) => {
       console.error(err);
-      res.status(500).json({ message: err.message });
+      res.status(serverError).send({ message: err.message });
     });
 };
 
@@ -37,11 +39,45 @@ const deleteItem = (req, res) => {
     })
     .catch((err) => {
       console.error(err);
-      res.status(404).json({ message: err.message });
+      res.status(notFound).send({ message: err.message });
     });
 };
 
-module.exports = { createItem, getItems, deleteItem };
-module.exports.createClothingItem = (req, res) => {
-  console.log(req.user._id);
+const likeItem = (req, res) => {
+  const { itemId } = req.params;
+  ClothingItem.findByIdAndUpdate(
+    itemId,
+    { $addToSet: { likes: req.user._id } },
+    { new: true }
+  )
+    .orFail(new Error("Not Found"))
+    .then((item) => {
+      res.send({ data: item });
+    })
+    .catch((err) => {
+      console.error(err);
+      res.status(notFound).send({ message: err.message });
+    });
 };
+
+const dislikeItem = (req, res) => {
+  const { itemId } = req.params;
+  ClothingItem.findByIdAndUpdate(
+    itemId,
+    { $pull: { likes: req.user._id } },
+    { new: true }
+  )
+    .orFail(new Error("Not Found"))
+    .then((item) => {
+      res.send({ data: item });
+    })
+    .catch((err) => {
+      console.error(err);
+      res.status(notFound).send({ message: err.message });
+    });
+};
+
+module.exports = { createItem, getItems, deleteItem, likeItem, dislikeItem };
+// module.exports.createClothingItem = (req, res) => {
+//   console.log(req.user._id);
+// };

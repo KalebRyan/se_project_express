@@ -1,11 +1,12 @@
 const User = require("../models/user");
+const { invalidData, notFound, serverError } = require("../utils/errors");
 
 const getUsers = (req, res) => {
   User.find({})
     .then((users) => res.send(users))
     .catch((err) => {
       console.error(err);
-      return res.status(500).send({ message: err.message });
+      return res.status(serverError).send({ message: err.message });
     });
 };
 
@@ -16,9 +17,9 @@ const createUser = (req, res) => {
     .catch((err) => {
       console.error(err);
       if (err.name === "ValidationError") {
-        return res.status(400).send({ message: err.message });
+        return res.status(invalidData).send({ message: err.message });
       }
-      return res.status(500).send({ message: err.message });
+      return res.status(serverError).send({ message: err.message });
     });
 };
 
@@ -30,9 +31,9 @@ const getUser = (req, res) => {
     .catch((err) => {
       console.error(err);
       if (err.message === "Not Found") {
-        return res.status(404).send({ message: "User not found" });
+        return res.status(notFound).send({ message: "User not found" });
       }
-      return res.status(500).send({ message: err.message });
+      return res.status(serverError).send({ message: err.message });
     });
 };
 
