@@ -33,6 +33,9 @@ const getUser = (req, res) => {
       if (err.message === "Not Found") {
         return res.status(notFound).send({ message: "User not found" });
       }
+      if (err.name === "CastError") {
+        return res.status(invalidData).send({ message: "Invalid ID" });
+      }
       return res.status(serverError).send({ message: err.message });
     });
 };

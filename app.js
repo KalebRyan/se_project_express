@@ -6,6 +6,12 @@ const app = express();
 const { PORT = 3001 } = process.env;
 
 app.use(express.json());
+app.use((req, res, next) => {
+  req.user = {
+    _id: "67214c36c9701d602ecffcd5",
+  };
+  next();
+});
 app.use("/", mainRouter);
 
 mongoose
@@ -17,11 +23,4 @@ mongoose
 
 app.listen(PORT, () => {
   console.log(`Server is listening on port ${PORT}`);
-});
-
-app.use((req, res, next) => {
-  req.user = {
-    _id: "67214c36c9701d602ecffcd5",
-  };
-  next();
 });
