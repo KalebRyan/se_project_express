@@ -45,6 +45,8 @@ const deleteItem = (req, res) => {
       if (err.name === "CastError") {
         return res.status(invalidData).send({ message: err.message });
       }
+
+      return res.status(serverError).send({ message: err.message });
     });
 };
 
@@ -70,6 +72,8 @@ const likeItem = (req, res) => {
       if (err.name === "CastError") {
         return res.status(invalidData).send({ message: err.message });
       }
+
+      return res.status(serverError).send({ message: err.message });
     });
 };
 
@@ -95,6 +99,8 @@ const dislikeItem = (req, res) => {
       if (err.name === "CastError") {
         return res.status(invalidData).send({ message: err.message });
       }
+
+      return res.status(serverError).send({ message: err.message });
     });
 };
 
