@@ -43,7 +43,7 @@ const deleteItem = (req, res) => {
         return res.status(notFound).send({ message: err.message });
       }
       if (err.name === "CastError") {
-        return res.status(serverError).send({ message: err.message });
+        return res.status(invalidData).send({ message: err.message });
       }
     });
 };
@@ -64,11 +64,11 @@ const likeItem = (req, res) => {
       if (err.message === "Not Found") {
         return res.status(notFound).send({ message: err.message });
       }
-      if (err.name === "ValidationError") {
+      if (err.message === "ValidationError") {
         return res.status(invalidData).send({ message: err.message });
       }
       if (err.name === "CastError") {
-        return res.status(serverError).send({ message: err.message });
+        return res.status(invalidData).send({ message: err.message });
       }
     });
 };
@@ -89,11 +89,11 @@ const dislikeItem = (req, res) => {
       if (err.message === "Not Found") {
         return res.status(notFound).send({ message: err.message });
       }
-      if (err.name === "ValidationError") {
+      if (err.message === "ValidationError") {
         return res.status(invalidData).send({ message: err.message });
       }
       if (err.name === "CastError") {
-        return res.status(serverError).send({ message: err.message });
+        return res.status(invalidData).send({ message: err.message });
       }
     });
 };
