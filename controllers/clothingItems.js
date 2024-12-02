@@ -15,7 +15,12 @@ const createItem = (req, res) => {
     })
     .catch((err) => {
       console.error(err);
-      res.status(invalidData).send({ message: err.message });
+      if (err.name === "ValidationError") {
+        return res.status(invalidData).send({ message: err.message });
+      }
+      return res
+        .status(serverError)
+        .send({ message: "An error has occurred on the server" });
     });
 };
 
@@ -26,7 +31,9 @@ const getItems = (req, res) => {
     })
     .catch((err) => {
       console.error(err);
-      res.status(serverError).send({ message: err.message });
+      res
+        .status(serverError)
+        .send({ message: "An error has occurred on the server" });
     });
 };
 
@@ -46,7 +53,9 @@ const deleteItem = (req, res) => {
         return res.status(invalidData).send({ message: err.message });
       }
 
-      return res.status(serverError).send({ message: err.message });
+      return res
+        .status(serverError)
+        .send({ message: "An error has occurred on the server" });
     });
 };
 
@@ -73,7 +82,9 @@ const likeItem = (req, res) => {
         return res.status(invalidData).send({ message: err.message });
       }
 
-      return res.status(serverError).send({ message: err.message });
+      return res
+        .status(serverError)
+        .send({ message: "An error has occurred on the server" });
     });
 };
 
@@ -100,11 +111,10 @@ const dislikeItem = (req, res) => {
         return res.status(invalidData).send({ message: err.message });
       }
 
-      return res.status(serverError).send({ message: err.message });
+      return res
+        .status(serverError)
+        .send({ message: "An error has occurred on the server" });
     });
 };
 
 module.exports = { createItem, getItems, deleteItem, likeItem, dislikeItem };
-// module.exports.createClothingItem = (req, res) => {
-//   console.log(req.user._id);
-// };
