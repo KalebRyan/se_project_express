@@ -40,7 +40,10 @@ const getItems = (req, res) => {
 const deleteItem = (req, res) => {
   const { itemId } = req.params;
   ClothingItem.findByIdAndDelete(itemId)
-    .orFail(new Error("Not Found"))
+    .orFail(() => {
+      const err = new Error("Not Found");
+      throw err;
+    })
     .then((item) => {
       res.send({ data: item });
     })
