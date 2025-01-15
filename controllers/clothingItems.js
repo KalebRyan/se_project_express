@@ -45,6 +45,11 @@ const deleteItem = (req, res) => {
       throw err;
     })
     .then((item) => {
+      if (!item.owner.equals(req.user._id)) {
+        const err = new Error("Forbidden");
+        err.status = 403;
+        throw err;
+      }
       res.send({ data: item });
     })
     .catch((err) => {
