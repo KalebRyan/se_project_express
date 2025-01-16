@@ -1,5 +1,7 @@
+const jwt = require("jsonwebtoken");
+const bcrypt = require("bcryptjs");
 const User = require("../models/user");
-const JWT_SECRET = require("../utils/config").JWT_SECRET;
+const { JWT_SECRET } = require("../utils/config").JWT_SECRET;
 const {
   invalidData,
   notFound,
@@ -7,8 +9,6 @@ const {
   clashError,
   unauthorized,
 } = require("../utils/errors");
-const jwt = require("jsonwebtoken");
-const bcrypt = require("bcryptjs");
 
 const getUsers = (req, res) => {
   User.find({})
