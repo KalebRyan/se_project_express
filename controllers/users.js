@@ -111,12 +111,9 @@ const updateUser = (req, res) => {
     { new: true, runValidators: true }
   )
     .orFail(new Error("Not Found"))
-    .then((user) => res.send(user))
+    .then((user) => res.send({ name: user.name, avatar: user.avatar }))
     .catch((err) => {
       console.error(err);
-      if (err.message === "Not Found") {
-        return res.status(notFound).send({ message: "User not found" });
-      }
       if (err.name === "ValidationError") {
         return res.status(invalidData).send({ message: err.message });
       }
