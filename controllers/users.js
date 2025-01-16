@@ -8,6 +8,7 @@ const {
   unauthorized,
 } = require("../utils/errors");
 const jwt = require("jsonwebtoken");
+const bcrypt = require("bcryptjs");
 
 const getUsers = (req, res) => {
   User.find({})
@@ -22,8 +23,18 @@ const getUsers = (req, res) => {
 
 const createUser = (req, res) => {
   const { name, avatar, email, password } = req.body;
-  User.create({ name, avatar, email, password })
-    .then((user) => res.send(user))
+
+  bcrypt
+    .hash(password, 10)
+    .then((hash) => User.create({ name, avatar, email, password: hash }))
+    .then((user) => {
+      res.send({
+        name: user.name,
+        email: user.email,
+        _id: user._id,
+        avatar: user.avatar,
+      });
+    })
     .catch((err) => {
       console.error(err);
       if (err.name === "ValidationError") {
