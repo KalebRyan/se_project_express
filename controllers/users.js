@@ -1,7 +1,7 @@
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcryptjs");
 const User = require("../models/user");
-const { JWT_SECRET } = require("../utils/config").JWT_SECRET;
+const { JWT_SECRET } = require("../utils/config");
 const {
   invalidData,
   notFound,
@@ -24,31 +24,40 @@ const getUsers = (req, res) => {
 const createUser = (req, res) => {
   const { name, avatar, email, password } = req.body;
 
-  bcrypt
-    .hash(password, 10)
-    .then((hash) => User.create({ name, avatar, email, password: hash }))
-    .then((user) => {
-      res.send({
-        name: user.name,
-        email: user.email,
-        _id: user._id,
-        avatar: user.avatar,
-      });
-    })
-    .catch((err) => {
-      console.error(err);
-      if (err.name === "ValidationError") {
-        return res.status(invalidData).send({ message: "Invalid ID" });
-      }
-      if (err.name === "MongoError" && err.code === 11000) {
+  User.find({ email }).then((user) => {
+    if (user) {
+      const error = new Error("This email is already registered");
+      error.name = "MongoError";
+      error.code = 11000;
+      throw error;
+    }
+
+    bcrypt
+      .hash(password, 10)
+      .then((hash) => User.create({ name, avatar, email, password: hash }))
+      .then((user) => {
+        res.send({
+          name: user.name,
+          email: user.email,
+          _id: user._id,
+          avatar: user.avatar,
+        });
+      })
+      .catch((err) => {
+        console.error(err);
+        if (err.name === "ValidationError") {
+          return res.status(invalidData).send({ message: "Invalid ID" });
+        }
+        if (err.name === "MongoError" && err.code === 11000) {
+          return res
+            .status(clashError)
+            .send({ message: "This email is already registered" });
+        }
         return res
-          .status(clashError)
-          .send({ message: "This email is already registered" });
-      }
-      return res
-        .status(serverError)
-        .send({ message: "An error has occurred on the server" });
-    });
+          .status(serverError)
+          .send({ message: "An error has occurred on the server" });
+      });
+  });
 };
 
 const getCurrentUser = (req, res) => {
