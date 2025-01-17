@@ -33,17 +33,16 @@ const createUser = (req, res) => {
         throw error;
       }
 
-      bcrypt
-        .hash(password, 10)
-        .then((hash) => User.create({ name, avatar, email, password: hash }))
-        .then((user) => {
-          res.send({
-            name: user.name,
-            email: user.email,
-            _id: user._id,
-            avatar: user.avatar,
-          });
-        });
+      return bcrypt.hash(password, 10);
+    })
+    .then((hash) => User.create({ name, avatar, email, password: hash }))
+    .then((newUser) => {
+      res.send({
+        name: newUser.name,
+        email: newUser.email,
+        _id: newUser._id,
+        avatar: newUser.avatar,
+      });
     })
     .catch((err) => {
       console.error(err);
