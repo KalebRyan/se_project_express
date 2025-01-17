@@ -24,7 +24,7 @@ const getUsers = (req, res) => {
 const createUser = (req, res) => {
   const { name, avatar, email, password } = req.body;
 
-  User.find({ email }).then((user) => {
+  User.findBy({ email }).then((user) => {
     if (user) {
       const error = new Error("This email is already registered");
       error.name = "MongoError";
