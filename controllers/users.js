@@ -24,40 +24,41 @@ const getUsers = (req, res) => {
 const createUser = (req, res) => {
   const { name, avatar, email, password } = req.body;
 
-  User.findBy({ email }).then((user) => {
-    if (user) {
-      const error = new Error("This email is already registered");
-      error.name = "MongoError";
-      error.code = 11000;
-      throw error;
-    }
+  User.findOne({ email })
+    .then((user) => {
+      if (user) {
+        const error = new Error("This email is already registered");
+        error.name = "MongoError";
+        error.code = 11000;
+        throw error;
+      }
 
-    bcrypt
-      .hash(password, 10)
-      .then((hash) => User.create({ name, avatar, email, password: hash }))
-      .then((user) => {
-        res.send({
-          name: user.name,
-          email: user.email,
-          _id: user._id,
-          avatar: user.avatar,
+      bcrypt
+        .hash(password, 10)
+        .then((hash) => User.create({ name, avatar, email, password: hash }))
+        .then((user) => {
+          res.send({
+            name: user.name,
+            email: user.email,
+            _id: user._id,
+            avatar: user.avatar,
+          });
         });
-      })
-      .catch((err) => {
-        console.error(err);
-        if (err.name === "ValidationError") {
-          return res.status(invalidData).send({ message: "Invalid ID" });
-        }
-        if (err.name === "MongoError" && err.code === 11000) {
-          return res
-            .status(clashError)
-            .send({ message: "This email is already registered" });
-        }
+    })
+    .catch((err) => {
+      console.error(err);
+      if (err.name === "ValidationError") {
+        return res.status(invalidData).send({ message: "Invalid ID" });
+      }
+      if (err.name === "MongoError" && err.code === 11000) {
         return res
-          .status(serverError)
-          .send({ message: "An error has occurred on the server" });
-      });
-  });
+          .status(clashError)
+          .send({ message: "This email is already registered" });
+      }
+      return res
+        .status(serverError)
+        .send({ message: "An error has occurred on the server" });
+    });
 };
 
 const getCurrentUser = (req, res) => {
