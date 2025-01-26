@@ -88,26 +88,18 @@ const login = (req, res) => {
       .send({ message: "Invalid email or password" });
   }
 
-  User.findUserByCredentials(email, password)
+  return User.findUserByCredentials(email, password)
     .then((user) => {
-      const token = jwt.sign({ userId: user._id }, JWT_SECRET, {
+      const token = jwt.sign({ _id: user._id }, JWT_SECRET, {
         expiresIn: "7d",
       });
       res.send({ token });
     })
     .catch((err) => {
       console.error(err);
-      if (err.message === "Incorrect email address") {
-        return res
-          .status(unauthorized)
-          .send({ message: "Incorrect email address" });
-      }
-      if (err.message === "Incorrect password") {
-        return res.status(unauthorized).send({ message: "Incorrect password" });
-      }
       return res
-        .status(serverError)
-        .send({ message: "An error has occurred on the server" });
+        .status(unauthorized)
+        .send({ message: "Invalid email or password" });
     });
 };
 
