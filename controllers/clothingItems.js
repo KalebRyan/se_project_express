@@ -39,6 +39,7 @@ const getItems = (req, res) => {
 
 const deleteItem = (req, res) => {
   const { itemId } = req.params;
+
   ClothingItem.findByIdAndDelete(itemId)
     .orFail(() => {
       const err = new Error("Not Found");
@@ -59,6 +60,9 @@ const deleteItem = (req, res) => {
       }
       if (err.name === "CastError") {
         return res.status(invalidData).send({ message: err.message });
+      }
+      if (err.message === "Forbidden") {
+        return res.status(403).send({ message: err.message });
       }
 
       return res

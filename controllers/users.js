@@ -61,8 +61,7 @@ const createUser = (req, res) => {
 };
 
 const getCurrentUser = (req, res) => {
-  const { userId } = req.user;
-  User.findById(userId)
+  User.findById(req.user._id)
     .orFail(new Error("Not Found"))
     .then((user) => res.send(user))
     .catch((err) => {
@@ -105,9 +104,8 @@ const login = (req, res) => {
 
 const updateUser = (req, res) => {
   const { name, avatar } = req.body;
-  const { userId } = req.user;
   User.findByIdAndUpdate(
-    userId,
+    req.user._id,
     { name, avatar },
     { new: true, runValidators: true }
   )
