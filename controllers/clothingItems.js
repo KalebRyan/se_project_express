@@ -1,5 +1,10 @@
 const ClothingItem = require("../models/clothingItem");
-const { invalidData, notFound, serverError } = require("../utils/errors");
+const {
+  invalidData,
+  notFound,
+  serverError,
+  forbidden,
+} = require("../utils/errors");
 
 const createItem = (req, res) => {
   const { name, weather, imageUrl } = req.body;
@@ -40,18 +45,17 @@ const getItems = (req, res) => {
 const deleteItem = (req, res) => {
   const { itemId } = req.params;
 
-  ClothingItem.findByIdAndDelete(itemId)
-    .orFail(() => {
-      const err = new Error("Not Found");
-      throw err;
-    })
+  ClothingItem.findById(itemId)
+    .orFail()
     .then((item) => {
       if (!item.owner.equals(req.user._id)) {
         const err = new Error("Forbidden");
         err.status = 403;
         throw err;
       }
-      res.send({ data: item });
+      return item
+        .deleteOne()
+        .then(() => res.status(200).send({ message: "Item deleted" }));
     })
     .catch((err) => {
       console.error(err);
@@ -62,7 +66,7 @@ const deleteItem = (req, res) => {
         return res.status(invalidData).send({ message: err.message });
       }
       if (err.message === "Forbidden") {
-        return res.status(403).send({ message: err.message });
+        return res.status(forbidden).send({ message: err.message });
       }
 
       return res

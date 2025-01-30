@@ -10,17 +10,6 @@ const {
   unauthorized,
 } = require("../utils/errors");
 
-const getUsers = (req, res) => {
-  User.find({})
-    .then((users) => res.send(users))
-    .catch((err) => {
-      console.error(err);
-      return res
-        .status(serverError)
-        .send({ message: "An error has occurred on the server" });
-    });
-};
-
 const createUser = (req, res) => {
   const { name, avatar, email, password } = req.body;
 
@@ -96,9 +85,14 @@ const login = (req, res) => {
     })
     .catch((err) => {
       console.error(err);
+      if (err.message === "Incorrect email address or password") {
+        return res
+          .status(unauthorized)
+          .send({ message: "Invalid email or password" });
+      }
       return res
-        .status(unauthorized)
-        .send({ message: "Invalid email or password" });
+        .status(serverError)
+        .send({ message: "An error has occurred on the server" });
     });
 };
 
@@ -113,6 +107,9 @@ const updateUser = (req, res) => {
     .then((user) => res.send({ name: user.name, avatar: user.avatar }))
     .catch((err) => {
       console.error(err);
+      if (err.message === "Not Found") {
+        return res.status(notFound).send({ message: "User not found" });
+      }
       if (err.name === "ValidationError") {
         return res.status(invalidData).send({ message: err.message });
       }
@@ -125,4 +122,4 @@ const updateUser = (req, res) => {
     });
 };
 
-module.exports = { getUsers, createUser, getCurrentUser, login, updateUser };
+module.exports = { createUser, getCurrentUser, login, updateUser };
